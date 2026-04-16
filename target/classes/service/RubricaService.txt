@@ -1,0 +1,24 @@
+package it.eros.rubrica.service;
+import it.eros.rubrica.model.Contatto; // 2. Importa la classe Contatto perché è in un altro package
+import it.eros.rubrica.exception.ContactNotFoundException;
+
+import java.util.ArrayList;
+public class RubricaService {
+	ArrayList<Contatto> lista = new ArrayList();
+	
+	public void aggiungiContatto(Contatto nuovoContatto){
+		lista.add(nuovoContatto);
+	}
+	public ArrayList<Contatto> getTutti(){
+		lista.sort((c1,c2) -> c1.getNome().compareToIgnoreCase(c2.getNome()));
+		return lista;
+	}
+	public boolean elimina(String nomeDaCancellare){
+		return lista.removeIf(Contatto -> Contatto.getNome().equalsIgnoreCase(nomeDaCancellare));
+}
+	public Contatto cercaPerNome (String nome) throws ContactNotFoundException{
+	return lista.stream()
+		.filter(c -> c.getNome().equalsIgnoreCase(nome))
+		.findFirst()
+		.orElseThrow(() -> new ContactNotFoundException("Il contatto " + nome + "non esiste!");
+}

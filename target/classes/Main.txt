@@ -1,0 +1,170 @@
+import it.eros.rubrica.service.RubricaService;
+import it.eros.rubrica.model.*; 
+import it.eros.rubrica.exception.ContactNotFoundException;
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.BufferedReader;
+import java.io.FileReader;
+
+public class Main{
+	static Scanner sc = new Scanner(System.in);
+	static boolean esci = false;
+	static boolean emailValida = false;
+	static RubricaService service = new RubricaService();
+
+
+	public static void main(String[] args) {
+	try {
+	BufferedReader br = new BufferedReader(new FileReader("file.txt"));
+	String riga;
+	while ((riga = br.readLine()) !=null){
+	String[] pezzi = riga.split(",");
+	if(pezzi[3].length() == 16){
+	service.aggiungiContatto(new ContattoPrivato(pezzi[0], pezzi[1], pezzi[2],pezzi[3]));
+	} else { service.aggiungiContatto(new ContattoAzienda(pezzi[0], pezzi[1], pezzi[2], pezzi[3]));
+}
+}
+br.close();
+} catch (Exception e) {
+	System.out.println("Errore impossibile caricare!");
+}
+	
+	while(!esci){
+	System.out.println("1. Aggiungi Contatto \n 2. Mostra tutti \n 3. Cerca contatto \n 4. Elimina contatto \n 5. Modifica Contatto \n 6. Esci");
+	System.out.println("Inserire il numero della scelta desiderata: ");
+	try{
+	int scelta = sc.nextInt();
+	sc.nextLine();	
+	if (scelta == 1) {
+	aggiungiContatto();
+}
+	else if (scelta == 2) {
+	ArrayList<Contatto> tutte = service.getTutti();
+	for (Contatto c : tutte){
+	c.stampaScheda();
+	System.out.println("...…………");
+   }
+}
+	else if (scelta == 3) {
+	cercaContatto();
+  }
+	else if (scelta == 4) {
+	System.out.println("Inserire nome da eliminare: ");
+	String n = sc.nextLine();
+	if(service.elimina(n)){
+	System.out.println("Eliminato con successo!");
+	}else{
+	System.out.println("Nessun contatto trovato!");}
+   }	
+  }
+	else if (scelta == 5) {
+        System.out.println("Inserire il nome contatto da modificare: ");
+        String n = sc.nextLine();
+        boolean trovato = false;
+
+        for (Contatto c : service.getTutti()) {
+            if (c.getNome().equalsIgnoreCase(n)) {
+                trovato = true;
+                System.out.println("Cosa vuoi modificare? \n 1. Nome \n 2. Telefono \n 3. Email");
+                int s = sc.nextInt();
+                sc.nextLine();
+                if (s == 1) {
+                    System.out.println("Nuovo nome: ");
+                    c.setNome(sc.nextLine());
+                } else if (s == 2) {
+                    System.out.println("Nuovo telefono: ");
+                    c.setTelefono(sc.nextLine());
+                } else if (s == 3) {
+                    System.out.println("Nuova email: ");
+                    c.setEmail(sc.nextLine());
+                }
+            }
+        } 
+        if (!trovato) {
+            System.out.println("Contatto non trovato.");
+        }
+    } 
+	else if (scelta == 6) {
+        System.out.println("Salvataggio in corso...");
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter("file.txt"));
+            
+            for (Contatto c : service.getTutti()) {
+                String riga = c.getNome() + "," + c.getTelefono() + "," + c.getEmail() + ",";
+                
+                if (c instanceof ContattoPrivato) {
+                    ContattoPrivato cp = (ContattoPrivato) c;
+                    riga += cp.getCodiceFiscale();
+                } else if (c instanceof ContattoAzienda) { // Corretto nome classe
+                    ContattoAzienda ca = (ContattoAzienda) c;
+                    riga += ca.getPartitaIva();
+                }
+                
+                bw.write(riga);
+                bw.newLine();
+            }
+            
+            bw.close(); // Ricorda sempre di chiudere il file!
+            System.out.println("Salvataggio completato. Arrivederci!");
+        } catch (Exception e) {
+            System.out.println("Errore nel salvataggio!");
+        }
+        esci = true;
+    } }
+	} catch (Exception e) {
+	System.out.println("Errore inserire un numero valido");
+	sc.nextLine();
+}
+}
+	public static void cercaContatto() {
+    System.out.println("Inserire nome da cercare: ");
+    String n = sc.nextLine();
+    
+    try {
+        // Proviamo a chiamare il service
+        Contatto trovato = service.cercaPerNome(n);
+        trovato.stampaScheda();
+    } catch (ContactNotFoundException e) {
+        // Se il service lancia l'eccezione, finiamo qui dentro
+        System.out.println("ERRORE: " + e.getMessage());
+    }
+}
+}
+	public static void aggiungiContatto() {
+    String mail = "";
+    boolean mailCorretta = false;
+    
+    System.out.println("1. Privato, 2. Azienda");
+    int tipo = sc.nextInt();
+    sc.nextLine();    
+    
+    System.out.println("Nome: "); String nome = sc.nextLine();
+    System.out.println("Telefono: "); String tel = sc.nextLine();
+    
+    while (!mailCorretta) { 
+        System.out.println("Email: "); 
+        mail = sc.nextLine(); 
+        if (mail.contains("@")) {
+            mailCorretta = true;
+        } else { 
+            System.out.println("Inserisci una mail corretta!");
+        }
+    }
+
+    System.out.println("Conferma tipo (1. Privato / 2. Azienda):");
+    int c = sc.nextInt();
+    sc.nextLine();
+    
+    if (c == 1) {
+        System.out.println("Codice Fiscale: ");
+        String cf = sc.nextLine();
+        service.aggiungiContatto(new ContattoPrivato(nome, tel, mail, cf));
+    } else {
+        System.out.println("Partita iva: ");
+        String piva = sc.nextLine();
+        service.aggiungiContatto(new ContattoAzienda(nome, tel, mail, piva));
+    }
+}
+}

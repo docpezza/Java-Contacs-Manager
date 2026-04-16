@@ -1,0 +1,17 @@
+package it.eros.rubrica.model;
+public class ContattoPrivato extends Contatto {
+	private String codiceFiscale;
+	public ContattoPrivato(String nome, String telefono, String email, String codiceFiscale){
+	super(nome, telefono, email);
+	this.codiceFiscale = codiceFiscale;;
+	
+	public String getCodiceFiscale(){
+	return codiceFiscale;
+	}
+
+	@Override
+	public void stampaScheda() {
+	super.stampaScheda();
+	System.out.println("C. Fiscale: " + codiceFiscale);
+	}
+}

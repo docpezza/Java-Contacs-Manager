@@ -1,0 +1,5 @@
+package it.eros.rubrica.exception;
+public class ContactNotFoundException extends Exception{
+	public ContactNotFoundException(String messaggio){
+	super(messaggio);
+}
