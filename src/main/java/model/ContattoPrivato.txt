@@ -5,7 +5,7 @@ public class ContattoPrivato extends Contatto {
 	super(nome, telefono, email);
 	this.codiceFiscale = codiceFiscale;;
 	
-	public String getCodiceFiscale(){
+	public String getCodiceFiscale(){ //metodo get per passare il codice fiscale
 	return codiceFiscale;
 	}
 

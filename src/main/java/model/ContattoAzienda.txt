@@ -19,7 +19,7 @@ public class ContattoAzienda extends Contatto {
         this.partitaIva = partitaIva;
     }
 		
-	@Override
+	@Override //richiamo stampa scheda di Contatto ma modifico dei pezzi
 	public void stampaScheda() {
 	super.stampaScheda();
 	System.out.println("P.Iva: " + partitaIva);

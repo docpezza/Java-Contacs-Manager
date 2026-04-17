@@ -3,23 +3,21 @@ import model.Contatto; // 2. Importa la classe Contatto perché è in un altro p
 import exception.ContactNotFoundException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 public class RubricaService {
-	ArrayList<Contatto> lista = new ArrayList(); //creamo array lista
+private Map<String, Contatto> rubrica = new HashMap<>();
 	
 	public void aggiungiContatto(Contatto nuovoContatto){ //funzione che aggiunge un contatto
-		lista.add(nuovoContatto);
+		rubrica.put(nuovoContatto.getNome(), nuovoContatto);
 	}
 	public ArrayList<Contatto> getTutti(){
-		lista.sort((c1,c2) -> c1.getNome().compareToIgnoreCase(c2.getNome()));
-		return lista;
+		return new ArrayList<>(rubrica.values());
 	}
 	public boolean elimina(String nomeDaCancellare){
-		return lista.removeIf(Contatto -> Contatto.getNome().equalsIgnoreCase(nomeDaCancellare));
-}
+		return rubrica.remove(nomeDaCancellare) != null;
+	}
 	public Contatto cercaPerNome (String nome) throws ContactNotFoundException{
-	return lista.stream()
-		.filter(c -> c.getNome().equalsIgnoreCase(nome))
-		.findFirst()
-		.orElseThrow(() -> new ContactNotFoundException("Il contatto " + nome + "non esiste!"));
+	return rubrica.get(nome);
 }
 }
