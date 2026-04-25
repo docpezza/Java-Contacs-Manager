@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
 import lombok.EqualsAndHashCode;
-import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
@@ -18,9 +17,15 @@ public class ContattoAzienda extends Contatto {
 
     // Costruttore manuale (Lombok fatica con l'ereditarietà dei costruttori del padre)
     public ContattoAzienda(String nome, String telefono, String email, String partitaIva) {
+
         super(nome, telefono, email);
         this.partitaIva = partitaIva;
     }
+
+	@Override
+public String toCsv() {
+    return String.format("%s,%s,%s,%s", getNome(), getTelefono(), getEmail(), partitaIva);
+}
 		
 	@Override //richiamo stampa scheda di Contatto ma modifico dei pezzi
 	public void stampaScheda() {
